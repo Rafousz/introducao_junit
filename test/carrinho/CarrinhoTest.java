@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import produto.Produto;
@@ -13,62 +12,132 @@ import produto.ProdutoNaoEncontradoException;
 class CarrinhoTest {
 
     private Carrinho carrinho;
-    private Produto p1;
-    private Produto p2;
 
     @BeforeEach
     void setUp() {
         carrinho = new Carrinho();
-        p1 = new Produto("Livro de Java Teste", 50.0);
-        p2 = new Produto("Mouse sem fio Teste", 100.0);
     }
-    
-    @DisplayName("Teste de carrinho vazio")
+
     @Test
-    void testCarrinhoIniciaVazio() {
+    void carrinhoDeveIniciarVazio() {
         assertEquals(0, carrinho.getQtdeItems());
-        assertEquals(0.0, carrinho.getValorTotal(), 0.0001);
     }
 
-    @DisplayName("Teste da funcionalidades de adicionar itens no carrinho")
     @Test
-    void testAdicionaItem() {
-        carrinho.addItem(p1);
-        assertEquals(1, carrinho.getQtdeItems());
+    void deveAdicionarProdutoAoCarrinho() {
+        Produto produto = new Produto("Notebook", 2500.00);
 
-        carrinho.addItem(p2);
+        carrinho.addItem(produto);
+
+        assertEquals(1, carrinho.getQtdeItems());
+    }
+
+    @Test
+    void deveAdicionarDoisProdutosAoCarrinho() {
+        Produto produto1 = new Produto("Notebook", 2500.00);
+        Produto produto2 = new Produto("Mouse", 100.00);
+
+        carrinho.addItem(produto1);
+        carrinho.addItem(produto2);
+
         assertEquals(2, carrinho.getQtdeItems());
     }
 
-    @DisplayName("Teste da função do valor total do carrinho")
     @Test
-    void testValorTotal() {
-        carrinho.addItem(p1);
-        carrinho.addItem(p2);
+    void deveCalcularValorTotalDeUmProduto() {
+        Produto produto = new Produto("Notebook", 2500.00);
 
-        assertEquals(150.0, carrinho.getValorTotal());
+        carrinho.addItem(produto);
+
+        assertEquals(2500.00, carrinho.getValorTotal());
     }
 
-    @DisplayName("Teste da funcionalidade de remover item do carrinho")
     @Test
-    void testRemoverItem() throws ProdutoNaoEncontradoException {
-        carrinho.addItem(p1);
-        carrinho.addItem(p2);
+    void deveCalcularValorTotalDeDoisProdutos() {
+        Produto produto1 = new Produto("Notebook", 2500.00);
+        Produto produto2 = new Produto("Mouse", 100.00);
 
-        carrinho.removeItem(p1);
+        carrinho.addItem(produto1);
+        carrinho.addItem(produto2);
 
-        assertEquals(1, carrinho.getQtdeItems());
+        assertEquals(2600.00, carrinho.getValorTotal());
     }
 
-    @DisplayName("Teste da função de esvaziar o carrinho")
     @Test
-    void testEsvazia() {
-        carrinho.addItem(p1);
-        carrinho.addItem(p2);
+    void valorTotalDeCarrinhoVazioDeveSerZero() {
+        assertEquals(0.0, carrinho.getValorTotal());
+    }
+
+    @Test
+    void deveRemoverProdutoDoCarrinho() throws ProdutoNaoEncontradoException {
+        Produto produto = new Produto("Notebook", 2500.00);
+
+        carrinho.addItem(produto);
+        carrinho.removeItem(produto);
+
+        assertEquals(0, carrinho.getQtdeItems());
+    }
+
+    @Test
+    void deveAtualizarValorTotalDepoisDeRemoverProduto()
+            throws ProdutoNaoEncontradoException {
+
+        Produto produto1 = new Produto("Notebook", 2500.00);
+        Produto produto2 = new Produto("Mouse", 100.00);
+
+        carrinho.addItem(produto1);
+        carrinho.addItem(produto2);
+
+        carrinho.removeItem(produto1);
+
+        assertEquals(100.00, carrinho.getValorTotal());
+    }
+
+    @Test
+    void deveLancarExcecaoAoRemoverProdutoInexistente() {
+        Produto produto = new Produto("Notebook", 2500.00);
+
+        assertThrows(
+            ProdutoNaoEncontradoException.class,
+            () -> carrinho.removeItem(produto)
+        );
+    }
+
+    @Test
+    void deveEsvaziarOCarrinho() {
+        Produto produto1 = new Produto("Notebook", 2500.00);
+        Produto produto2 = new Produto("Mouse", 100.00);
+
+        carrinho.addItem(produto1);
+        carrinho.addItem(produto2);
 
         carrinho.esvazia();
 
         assertEquals(0, carrinho.getQtdeItems());
-        assertEquals(0.0, carrinho.getValorTotal(), 0.0001);
+    }
+
+    @Test
+    void valorTotalDeveSerZeroDepoisDeEsvaziarCarrinho() {
+        Produto produto1 = new Produto("Notebook", 2500.00);
+        Produto produto2 = new Produto("Mouse", 100.00);
+
+        carrinho.addItem(produto1);
+        carrinho.addItem(produto2);
+
+        carrinho.esvazia();
+
+        assertEquals(0.0, carrinho.getValorTotal());
+    }
+
+    @Test
+    void devePermitirAdicionarProdutosComMesmoNome() {
+        Produto produto1 = new Produto("Notebook", 2500.00);
+        Produto produto2 = new Produto("Notebook", 3000.00);
+
+        carrinho.addItem(produto1);
+        carrinho.addItem(produto2);
+
+        assertEquals(2, carrinho.getQtdeItems());
+        assertEquals(5500.00, carrinho.getValorTotal());
     }
 }
